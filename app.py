@@ -1,31 +1,16 @@
-import subprocess
-import sys
-
-# Auto-install joblib if missing
+ ---------------------------------------------------------------------------
+# Joblib import with error handling
+# ---------------------------------------------------------------------------
 try:
     import joblib
-    print("✅ joblib imported successfully")
 except ImportError:
-    print("⚠️ joblib not found, installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "joblib"])
-    import joblib
-    print("✅ joblib installed and imported successfully")
-"""
-Diabetes Prediction System
-==========================
+    import streamlit as st
+    st.error("""
+    ❌ **joblib package not found!**
 
-A complete, single-file machine learning application for predicting diabetes
-risk using the Pima Indians Diabetes dataset. The app performs data loading,
-preprocessing, exploratory data analysis (EDA), feature scaling, training and
-comparison of seven classification models, automatic selection of the best
-model based on F1-score, model persistence, and provides a professional
-Streamlit user interface for exploring results and making predictions.
+    Please make sure `joblib` is in your requirements.txt file.
 
-Author: (Student submission)
-Python version: 3.12
-Run with: streamlit run app.py
-"""
-
+    Add this line to requirements.txt:
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
@@ -188,7 +173,7 @@ def validate_dataset(df: pd.DataFrame) -> Tuple[bool, str]:
         df: The raw dataset.
 
     Returns:
-        A tuple of (is_valid, message).
+        A tuple of(is_valid, message).
     """
     required_columns = set(FEATURE_COLUMNS + [TARGET_COLUMN])
     missing_columns = required_columns - set(df.columns)
@@ -208,7 +193,7 @@ def validate_dataset(df: pd.DataFrame) -> Tuple[bool, str]:
 def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     """Clean the raw dataset by handling implausible zero values.
 
-    Zero values in physiologically implausible columns (e.g. Glucose,
+    Zero values in physiologically implausible columns(e.g. Glucose,
     BloodPressure) are replaced with NaN, then imputed using the column
     median. This is a standard preprocessing step for the Pima Indians
     Diabetes dataset.
@@ -353,7 +338,7 @@ def load_saved_model() -> Tuple[Optional[object], Optional[StandardScaler]]:
     """Load a previously saved model and scaler from disk, if present.
 
     Returns:
-        A tuple of (model, scaler), either of which may be None.
+        A tuple of(model, scaler), either of which may be None.
     """
     model, scaler = None, None
     try:

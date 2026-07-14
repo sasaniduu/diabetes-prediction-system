@@ -2,6 +2,38 @@
 # ---------------------------------------------------------------------------
 # Joblib import with error handling
 # ---------------------------------------------------------------------------
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
+)
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+import streamlit as st
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from typing import Dict, Optional, Tuple
+from dataclasses import dataclass, field
+import warnings
+import os
+import logging
+import io
+import subprocess
+import sys
+subprocess.check_call([sys.executable, "-m", "pip", "install", "joblib"])
 try:
     import joblib
 except ImportError:
@@ -15,36 +47,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
-import io
-import logging
-import os
-import warnings
-from dataclasses import dataclass, field
-from typing import Dict, Optional, Tuple
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import streamlit as st
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    accuracy_score,
-    confusion_matrix,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-    roc_curve,
-)
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
 
 warnings.filterwarnings("ignore")
 

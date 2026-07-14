@@ -391,13 +391,11 @@ def plot_confusion_matrix_fig(y_test: pd.Series, y_pred: np.ndarray, model_name:
     """Plot a confusion matrix for a given model's predictions."""
     fig, ax = plt.subplots(figsize=(5, 4))
     cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[
-                                  "No Diabetes", "Diabetes"])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["No Diabetes", "Diabetes"])
     disp.plot(ax=ax, cmap="Blues", colorbar=False)
-    ax.set_title(f"Confusion Matrix — {model_name}")
+    ax.set_title(f"Confusion Matrix - {model_name}")
     fig.tight_layout()
     return fig
-
 
 def plot_roc_curve_fig(y_test: pd.Series, y_proba: np.ndarray, model_name: str) -> plt.Figure:
     """Plot the ROC curve for a given model."""

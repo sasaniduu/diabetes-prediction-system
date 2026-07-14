@@ -1,3 +1,15 @@
+import subprocess
+import sys
+
+# Auto-install joblib if missing
+try:
+    import joblib
+    print("✅ joblib imported successfully")
+except ImportError:
+    print("⚠️ joblib not found, installing...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "joblib"])
+    import joblib
+    print("✅ joblib installed and imported successfully")
 """
 Diabetes Prediction System
 ==========================

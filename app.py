@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
 # Joblib import with error handling
 # ---------------------------------------------------------------------------
@@ -5,12 +6,12 @@ try:
     import joblib
 except ImportError:
     import streamlit as st
-    st.error("""
-    ❌ **joblib package not found!**
+    st.error(
+        "joblib package not found! Please make sure `joblib` is in your "
+        "requirements.txt file. Add this line to requirements.txt:\n\njoblib"
+    )
+    st.stop()
 
-    Please make sure `joblib` is in your requirements.txt file.
-
-    Add this line to requirements.txt:
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
@@ -21,8 +22,6 @@ import warnings
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple
 
-
-# joblib already imported above (line 4)
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -174,7 +173,7 @@ def validate_dataset(df: pd.DataFrame) -> Tuple[bool, str]:
         df: The raw dataset.
 
     Returns:
-        A tuple of(is_valid, message).
+        A tuple of (is_valid, message).
     """
     required_columns = set(FEATURE_COLUMNS + [TARGET_COLUMN])
     missing_columns = required_columns - set(df.columns)
@@ -194,7 +193,7 @@ def validate_dataset(df: pd.DataFrame) -> Tuple[bool, str]:
 def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     """Clean the raw dataset by handling implausible zero values.
 
-    Zero values in physiologically implausible columns(e.g. Glucose,
+    Zero values in physiologically implausible columns (e.g. Glucose,
     BloodPressure) are replaced with NaN, then imputed using the column
     median. This is a standard preprocessing step for the Pima Indians
     Diabetes dataset.
@@ -330,7 +329,7 @@ def save_best_model(artifacts: TrainingArtifacts) -> None:
         joblib.dump(artifacts.scaler, SCALER_FILE_NAME)
         logger.info("Saved best model ('%s') and scaler to disk.",
                     artifacts.best_model_name)
-    except (OSError, joblib.externals.loky.process_executor.TerminatedWorkerError) as exc:
+    except OSError as exc:
         logger.error("Failed to save model artifacts: %s", exc)
         st.warning(f"Could not save model to disk: {exc}")
 
@@ -339,7 +338,7 @@ def load_saved_model() -> Tuple[Optional[object], Optional[StandardScaler]]:
     """Load a previously saved model and scaler from disk, if present.
 
     Returns:
-        A tuple of(model, scaler), either of which may be None.
+        A tuple of (model, scaler), either of which may be None.
     """
     model, scaler = None, None
     try:
@@ -358,7 +357,8 @@ def load_saved_model() -> Tuple[Optional[object], Optional[StandardScaler]]:
 def plot_class_balance(df: pd.DataFrame) -> plt.Figure:
     """Plot the class distribution of the target variable."""
     fig, ax = plt.subplots(figsize=(5, 4))
-    sns.countplot(x=TARGET_COLUMN, data=df, ax=ax, palette="Set2")
+    sns.countplot(x=TARGET_COLUMN, data=df, ax=ax, hue=TARGET_COLUMN,
+                  palette="Set2", legend=False)
     ax.set_title("Class Distribution (0 = No Diabetes, 1 = Diabetes)")
     ax.set_xlabel("Outcome")
     ax.set_ylabel("Count")
@@ -388,15 +388,16 @@ def plot_correlation_heatmap(df: pd.DataFrame) -> plt.Figure:
 
 
 def plot_confusion_matrix_fig(y_test: pd.Series, y_pred: np.ndarray, model_name: str) -> plt.Figure:
-    # Plot a confusion matrix for a given model's predictions.
+    """Plot a confusion matrix for a given model's predictions."""
     fig, ax = plt.subplots(figsize=(5, 4))
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[
-                                  "No Diabetes", "Diabetes"])
+        "No Diabetes", "Diabetes"])
     disp.plot(ax=ax, cmap="Blues", colorbar=False)
     ax.set_title(f"Confusion Matrix - {model_name}")
     fig.tight_layout()
     return fig
+
 
 def plot_roc_curve_fig(y_test: pd.Series, y_proba: np.ndarray, model_name: str) -> plt.Figure:
     """Plot the ROC curve for a given model."""
@@ -408,7 +409,7 @@ def plot_roc_curve_fig(y_test: pd.Series, y_proba: np.ndarray, model_name: str) 
     ax.plot([0, 1], [0, 1], linestyle="--", color="grey", label="Chance")
     ax.set_xlabel("False Positive Rate")
     ax.set_ylabel("True Positive Rate")
-    ax.set_title(f"ROC Curve — {model_name}")
+    ax.set_title(f"ROC Curve - {model_name}")
     ax.legend(loc="lower right")
     fig.tight_layout()
     return fig
@@ -439,7 +440,7 @@ def plot_feature_importance_fig(model: object, feature_names: list, model_name: 
         [importances[i] for i in order][::-1],
         color="teal",
     )
-    ax.set_title(f"Feature Importance — {model_name}")
+    ax.set_title(f"Feature Importance - {model_name}")
     ax.set_xlabel("Relative Importance")
     fig.tight_layout()
     return fig
@@ -473,7 +474,7 @@ def validate_prediction_inputs(values: Dict[str, float]) -> Tuple[bool, str]:
         values: Dictionary of feature name to entered value.
 
     Returns:
-        Tuple of(is_valid, error_message).
+        Tuple of (is_valid, error_message).
     """
     for feature, value in values.items():
         low, high, _ = INPUT_RANGES[feature]
@@ -489,20 +490,20 @@ def validate_prediction_inputs(values: Dict[str, float]) -> Tuple[bool, str]:
 # ---------------------------------------------------------------------------
 def render_home_page() -> None:
     """Render the Home / landing page."""
-    st.title("🩺 Diabetes Prediction System")
+    st.title("Diabetes Prediction System")
     st.markdown(
         """
-        Welcome to the ** Diabetes Prediction System**, a machine-learning-powered
-        application built on the ** Pima Indians Diabetes Dataset**.
+        Welcome to the **Diabetes Prediction System**, a machine-learning-powered
+        application built on the **Pima Indians Diabetes Dataset**.
 
         This system:
         - Explores and cleans the underlying clinical dataset
-        - Trains and compares ** seven ** classification algorithms
-        - Automatically selects the best-performing model using ** F1-score **
+        - Trains and compares **seven** classification algorithms
+        - Automatically selects the best-performing model using **F1-score**
         - Lets you enter patient measurements to obtain a diabetes risk prediction
 
-        Use the sidebar to navigate between the ** Exploratory Data Analysis**,
-        **Model Comparison**, **Prediction**, and **About ** pages.
+        Use the sidebar to navigate between the **Exploratory Data Analysis**,
+        **Model Comparison**, **Prediction**, and **About** pages.
         """
     )
     st.info("Use the sidebar menu on the left to get started.")
@@ -510,7 +511,7 @@ def render_home_page() -> None:
 
 def render_eda_page(df: pd.DataFrame, clean_df: pd.DataFrame) -> None:
     """Render the Exploratory Data Analysis page."""
-    st.title("📊 Exploratory Data Analysis")
+    st.title("Exploratory Data Analysis")
 
     st.subheader("Raw Dataset Preview")
     st.dataframe(df.head(10))
@@ -536,7 +537,7 @@ def render_eda_page(df: pd.DataFrame, clean_df: pd.DataFrame) -> None:
 
 def render_model_comparison_page(artifacts: TrainingArtifacts) -> None:
     """Render the model comparison and evaluation metrics page."""
-    st.title("🤖 Model Training & Comparison")
+    st.title("Model Training & Comparison")
 
     st.markdown(
         "Seven classification models were trained and evaluated on a held-out "
@@ -560,7 +561,7 @@ def render_model_comparison_page(artifacts: TrainingArtifacts) -> None:
     st.dataframe(metrics_df, use_container_width=True)
 
     st.success(
-        f"✅ Best model selected automatically (highest F1-score): "
+        f"Best model selected automatically (highest F1-score): "
         f"**{artifacts.best_model_name}**"
     )
 
@@ -604,7 +605,7 @@ def render_model_comparison_page(artifacts: TrainingArtifacts) -> None:
 
 def render_prediction_page(artifacts: TrainingArtifacts) -> None:
     """Render the manual patient-input prediction page."""
-    st.title("🔮 Diabetes Risk Prediction")
+    st.title("Diabetes Risk Prediction")
     st.markdown(
         f"Predictions are generated using the automatically selected best model: "
         f"**{artifacts.best_model_name}**"
@@ -666,9 +667,9 @@ def render_prediction_page(artifacts: TrainingArtifacts) -> None:
 
             st.subheader("Prediction Result")
             if prediction == 1:
-                st.error("⚠️ The model predicts a **HIGH risk of diabetes**.")
+                st.error("The model predicts a **HIGH risk of diabetes**.")
             else:
-                st.success("✅ The model predicts a **LOW risk of diabetes**.")
+                st.success("The model predicts a **LOW risk of diabetes**.")
 
             if probability is not None:
                 st.metric("Estimated Probability of Diabetes",
@@ -691,30 +692,30 @@ def render_prediction_page(artifacts: TrainingArtifacts) -> None:
 
 def render_about_page() -> None:
     """Render the About page with project and disclaimer information."""
-    st.title("ℹ️ About This Application")
+    st.title("About This Application")
     st.markdown(
         """
-        ** Diabetes Prediction System ** was developed as part of the * Advanced
-        Machine Learning * module(COM763) portfolio assessment.
+        **Diabetes Prediction System** was developed as part of the
+        *Advanced Machine Learning* module (COM763) portfolio assessment.
 
-        **Dataset: ** Pima Indians Diabetes Dataset — 768 records of female
+        **Dataset:** Pima Indians Diabetes Dataset - 768 records of female
         patients of Pima Indian heritage, containing diagnostic measurements
         and a binary diabetes outcome.
 
-        **Models compared: **
+        **Models compared:**
         - Logistic Regression
         - Decision Tree
         - Random Forest
-        - Support Vector Machine(SVM)
-        - K-Nearest Neighbours(KNN)
+        - Support Vector Machine (SVM)
+        - K-Nearest Neighbours (KNN)
         - Naive Bayes
         - Gradient Boosting
 
-        ** Model selection: ** The best-performing model is chosen automatically
-        based on the highest ** F1-score ** on a held-out test set, balancing
-        precision and recall for the positive(diabetic) class .
+        **Model selection:** The best-performing model is chosen automatically
+        based on the highest **F1-score** on a held-out test set, balancing
+        precision and recall for the positive (diabetic) class.
 
-        **Disclaimer: ** This tool is for educational purposes only and must
+        **Disclaimer:** This tool is for educational purposes only and must
         not be used for real clinical diagnosis or treatment decisions.
         """
     )
@@ -727,12 +728,12 @@ def main() -> None:
     """Main entry point for the Streamlit application."""
     st.set_page_config(
         page_title="Diabetes Prediction System",
-        page_icon="🩺",
+        page_icon=":stethoscope:",
         layout="wide",
         initial_sidebar_state="expanded",
     )
 
-    st.sidebar.title("🩺 Navigation")
+    st.sidebar.title("Navigation")
     page = st.sidebar.radio(
         "Go to:",
         ["Home", "Exploratory Data Analysis",
@@ -752,7 +753,7 @@ def main() -> None:
 
     if raw_df is None:
         st.warning(
-            f"⚠️ No dataset available. Please add '{DATA_FILE_NAME}' to the app "
+            f"No dataset available. Please add '{DATA_FILE_NAME}' to the app "
             "directory or upload it using the sidebar."
         )
         st.stop()
@@ -778,7 +779,7 @@ def main() -> None:
         render_eda_page(raw_df, clean_df)
     elif page == "Model Training & Comparison":
         render_model_comparison_page(artifacts)
-        if st.sidebar.button("💾 Save Best Model to Disk"):
+        if st.sidebar.button("Save Best Model to Disk"):
             save_best_model(artifacts)
             st.sidebar.success("Best model saved successfully.")
     elif page == "Prediction":
